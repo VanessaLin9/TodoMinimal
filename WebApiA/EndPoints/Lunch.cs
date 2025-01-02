@@ -1,10 +1,10 @@
+using System.Text;
 using Newtonsoft.Json;
 
 namespace WebApiA.EndPoints;
 
 public static class Lunch
 {
-    private static HttpClient _httpClient;
 
     public static IEndpointRouteBuilder MapLunchApi(this IEndpointRouteBuilder app)
     {
@@ -15,34 +15,34 @@ public static class Lunch
         return app;
     }
     
-    private static IResult LoginToB()
+    private static async Task<IResult> LoginToB(HttpClient httpClient)
     {
-        var postAsync = PostAsync(new Request
+        var response =await PostAsync(httpClient, new Request
         {
             Message = "GG login"
         });
-        return Results.Ok(postAsync);
+        return Results.Ok(response);
     }
 
-    private static async Task<Response?> PostAsync(Request request)
+    private static async Task<Response?> PostAsync(HttpClient httpClient, Request request)
     {
         var requestContent = JsonConvert.SerializeObject(request);
         var httpRequestMessage = new HttpRequestMessage();
-        httpRequestMessage.Content = new StringContent(requestContent);
+        httpRequestMessage.Content = new StringContent(requestContent, Encoding.UTF8, "application/json");
         httpRequestMessage.Method = HttpMethod.Post;
-        httpRequestMessage.RequestUri = new Uri("/localhost");
+        httpRequestMessage.RequestUri = new Uri("http://localhost:5006/login");
 
-        var response = await (await _httpClient.SendAsync(httpRequestMessage)).Content.ReadAsStringAsync();
+        var response = await (await httpClient.SendAsync(httpRequestMessage)).Content.ReadAsStringAsync();
         return JsonConvert.DeserializeObject<Response>(response);
     }
 }
 
 internal class Response
 {
-    public string Message { get; set; }
+    public string Message { get; set; } = String.Empty;
 }
 
 internal class Request
 {
-    public string Message { get; set; }
+    public string Message { get; set; } = String.Empty;
 }

@@ -2,6 +2,7 @@ using WebApiA.EndPoints;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddHttpClient();
 
 builder.Services.AddSwaggerGen();
 

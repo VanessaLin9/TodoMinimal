@@ -10,11 +10,23 @@ public static class Lunch
     {
         var lunchApiGroup = app.MapGroup("Lunch");
         
-        lunchApiGroup.MapGet("/", LoginToB);
+        lunchApiGroup.MapGet("/", Hello);
+        lunchApiGroup.MapPost("/getaa", LoginFrom7);
         
         return app;
     }
-    
+
+    private static IResult Hello(HttpContext context)
+    {
+        return Results.Ok("Hello!");
+    }
+
+    private static IResult LoginFrom7(HttpClient client,LoginRequest request)
+    {
+        Console.WriteLine(request.UserName);
+        return Results.Ok("123AA");
+    }
+
     private static async Task<IResult> LoginToB(HttpClient httpClient)
     {
         var response =await PostAsync(httpClient, new Request
@@ -35,6 +47,12 @@ public static class Lunch
         var response = await (await httpClient.SendAsync(httpRequestMessage)).Content.ReadAsStringAsync();
         return JsonConvert.DeserializeObject<Response>(response);
     }
+}
+
+internal class LoginRequest : Request
+{
+    public string UserName { get; set; }
+    public string Id { get; set; }
 }
 
 internal class Response

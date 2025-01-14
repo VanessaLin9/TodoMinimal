@@ -1,4 +1,5 @@
 using System.Text;
+using Microsoft.Extensions.Primitives;
 using Newtonsoft.Json;
 
 namespace WebApiA.EndPoints;
@@ -21,10 +22,14 @@ public static class Lunch
         return Results.Ok("Hello!");
     }
 
-    private static IResult LoginFrom7(HttpClient client,LoginRequest request)
+    private static IResult LoginFrom7(HttpClient client, HttpContext context, LoginRequest request)
     {
-        Console.WriteLine(request.UserName);
-        return Results.Ok("123AA");
+        Console.WriteLine(context.Request.Headers.Authorization);
+        return Results.Ok(new LoginResponse
+        {
+            Message = $"{request.UserName} is login success! from {context.Connection.RemoteIpAddress}",
+            Time = DateTime.Now
+        });
     }
 
     private static async Task<IResult> LoginToB(HttpClient httpClient)
@@ -49,10 +54,14 @@ public static class Lunch
     }
 }
 
+internal class LoginResponse : Response
+{
+    public DateTime Time { get; set; }
+}
+
 internal class LoginRequest : Request
 {
     public string UserName { get; set; }
-    public string Id { get; set; }
 }
 
 internal class Response
